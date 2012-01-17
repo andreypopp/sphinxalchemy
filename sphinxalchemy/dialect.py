@@ -23,7 +23,7 @@ class SphinxCompiler(compiler.SQLCompiler):
         return " OPTION %s" % options
 
     def visit_match(self, match):
-        return "MATCH('%s')" % match.query
+        return "MATCH('%s')" % match.query.replace("'", "\\'")
 
     def visit_select(self, select, asfrom=False, parens=True,
                             iswrapper=False, fromhints=None,
