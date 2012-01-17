@@ -3,6 +3,8 @@
 from sqlalchemy.schema import Table, Column
 from sqlalchemy import types
 
+from sphinxalchemy.sphinxql import select
+
 __all__ = ("Index", "Attribute")
 
 class Index(Table):
@@ -11,6 +13,9 @@ class Index(Table):
         super(Index, self).__init__(*args, **kwargs)
         self.append_column(SpecialAttribute("id"))
         self.append_column(SpecialAttribute("weight"))
+
+    def select(self, whereclause=None, **params):
+        return select([self], whereclause, **params)
 
 class Attribute(Column):
 
