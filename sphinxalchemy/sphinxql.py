@@ -2,7 +2,7 @@
 
 from sqlalchemy.sql import expression
 
-__all__ = ("SelectClause", "select")
+__all__ = ("Select", "select")
 
 class _Options(object):
 
