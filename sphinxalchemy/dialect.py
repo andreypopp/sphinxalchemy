@@ -6,9 +6,14 @@ from sqlalchemy.sql import compiler
 from sqlalchemy.sql import expression as sql
 from sqlalchemy import util
 
+from sphinxalchemy.schema import SpecialAttribute
+
 __all__ = ("SphinxDialect",)
 
 class SphinxCompiler(compiler.SQLCompiler):
+
+    def _check_unicode_returns(self, connection):
+        return True
 
     def within_group_order_by_clause(self, select, **kw):
         order_by = select._within_group_order_by_clause._compiler_dispatch(
@@ -21,6 +26,28 @@ class SphinxCompiler(compiler.SQLCompiler):
     def options_clause(self, select, **_kw):
         options = ", ".join("%s=%s" % (k, v) for (k, v) in select._options)
         return " OPTION %s" % options
+
+    def visit_column(self, column, result_map=None, **kwargs):
+        name = column.name
+        if name is None:
+            raise exc.CompileError("Cannot compile Column object until "
+                                   "it's 'name' is assigned.")
+
+        is_literal = column.is_literal
+        if not is_literal and isinstance(name, sql._generated_label):
+            name = self._truncated_identifier("colident", name)
+
+        if result_map is not None:
+            result_map[name.lower()] = (name, (column, ), column.type)
+
+        if is_literal:
+            name = self.escape_literal_column(name)
+        else:
+            name = self.preparer.quote(name, column.quote)
+
+        if isinstance(column, SpecialAttribute):
+            name = "@" + name
+        return name
 
     def visit_match(self, match):
         return "MATCH('%s')" % match.query.replace("'", "\\'")
