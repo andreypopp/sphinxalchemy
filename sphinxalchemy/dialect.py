@@ -168,6 +168,9 @@ class SphinxDialect(default.DefaultDialect, mysqldb.MySQLDBConnector):
     name = "sphinx"
     statement_compiler = SphinxCompiler
 
+    def _check_unicode_returns(self, connection):
+        return True
+
     def do_rollback(self, connection):
         pass
 
