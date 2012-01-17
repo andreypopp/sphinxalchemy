@@ -6,7 +6,7 @@ from sqlalchemy.sql import expression
 
 from sphinxalchemy.sphinxql import select
 
-__all__ = ("Index", "Attribute")
+__all__ = ("Index", "Attribute", "ArrayAttribute")
 
 class Index(Table):
 
