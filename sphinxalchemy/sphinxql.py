@@ -18,10 +18,21 @@ class _Options(object):
     def __iter__(self):
         return iter(self.options)
 
+class MatchClause(expression.ClauseElement):
+
+    __visit_name__ = "match"
+
+    def __init__(self, query):
+        self.query = query
+
 class Select(expression.Select):
 
     _within_group_order_by_clause = expression.ClauseList()
     _options = None
+
+    @expression._generative
+    def match(self, query):
+        self.append_whereclause(MatchClause(query))
 
     @expression._generative
     def within_group_order_by(self, *clauses):

@@ -22,6 +22,9 @@ class SphinxCompiler(compiler.SQLCompiler):
         options = ", ".join("%s=%s" % (k, v) for (k, v) in select._options)
         return " OPTION %s" % options
 
+    def visit_match(self, match):
+        return "MATCH('%s')" % match.query
+
     def visit_select(self, select, asfrom=False, parens=True,
                             iswrapper=False, fromhints=None,
                             compound_index=1, **kwargs):
