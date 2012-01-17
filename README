@@ -1,0 +1,14 @@
+SphinxQL dialect for SQLAlchemy
+===============================
+
+Usage:
+
+  1. Make sure you have sphinxalchemy package installed.
+
+  2. Create engine with sphinx:// URI prefix:
+
+    >>> from sqlalchemy import create_engine
+    >>> e = create_engine("sphinx://127.0.0.1:9306")
+
+  3. Use standard sqlalchemy.sql constructs or look at sphinxalchemy module for
+     custom SphinxQL constructs.
