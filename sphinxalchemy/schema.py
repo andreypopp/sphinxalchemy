@@ -2,6 +2,7 @@
 
 from sqlalchemy.schema import Table, Column
 from sqlalchemy import types
+from sqlalchemy.sql import expression
 
 from sphinxalchemy.sphinxql import select
 
@@ -34,6 +35,11 @@ class ArrayAttribute(Column):
             args.pop(1)
         kwargs["type_"] = ArrayAttributeType()
         super(ArrayAttribute, self).__init__(*args, **kwargs)
+
+    def _bind_param(self, operator, obj):
+        return expression._BindParamClause(
+            None, obj, _compared_to_operator=operator,
+            _compared_to_type=types.Integer(), unique=True)
 
 class SpecialAttribute(Attribute):
     pass
