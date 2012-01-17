@@ -12,9 +12,6 @@ __all__ = ("SphinxDialect",)
 
 class SphinxCompiler(compiler.SQLCompiler):
 
-    def _check_unicode_returns(self, connection):
-        return True
-
     def within_group_order_by_clause(self, select, **kw):
         order_by = select._within_group_order_by_clause._compiler_dispatch(
             self, **kw)
@@ -85,6 +82,7 @@ class SphinxCompiler(compiler.SQLCompiler):
                         within_columns_clause=True,
                         **column_clause_args)
                 for co in util.unique_list(select.inner_columns)
+                if not isinstance(co, SpecialAttribute)
             ]
             if c is not None
         ]
