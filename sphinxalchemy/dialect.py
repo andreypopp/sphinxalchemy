@@ -21,8 +21,16 @@ class SphinxCompiler(compiler.SQLCompiler):
             return ""
 
     def options_clause(self, select, **_kw):
-        options = ", ".join("%s=%s" % (k, v) for (k, v) in select._options)
-        return " OPTION %s" % options
+        def _compile(o, inner=False):
+            r = ", ".join("%s=%s" % (
+                (k, v)
+                    if not isinstance(v, dict)
+                    else (k, _compile(v.items(),True)))
+                for (k, v) in o)
+            if inner:
+                return "(" + r + ")"
+            return r
+        return " OPTION %s" % _compile(select._options)
 
     def limit_clause(self, select):
         text = ""
