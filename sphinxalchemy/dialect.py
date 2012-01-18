@@ -4,7 +4,7 @@ from sqlalchemy.connectors import mysqldb
 from sqlalchemy.engine import default
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql import expression as sql
-from sqlalchemy import util
+from sqlalchemy import util, exc
 
 from sphinxalchemy.schema import SpecialAttribute
 
@@ -23,6 +23,20 @@ class SphinxCompiler(compiler.SQLCompiler):
     def options_clause(self, select, **_kw):
         options = ", ".join("%s=%s" % (k, v) for (k, v) in select._options)
         return " OPTION %s" % options
+
+    def limit_clause(self, select):
+        text = ""
+        if select._limit is not None and select._offset is None:
+            text +=  "\n LIMIT " + self.process(sql.literal(select._limit))
+        elif select._limit is not None and select._offset is not None:
+            text +=  "\n LIMIT %s, %s" % (
+                self.process(sql.literal(select._offset)),
+                self.process(sql.literal(select._limit)))
+        elif select._offset is not None:
+            raise exc.CompileError(
+                "Cannot compile LIMIT clause, SELECT couldn't have only OFFSET"
+                " clause without LIMIT")
+        return text
 
     def visit_column(self, column, result_map=None, **kwargs):
         name = column.name
@@ -146,7 +160,7 @@ class SphinxCompiler(compiler.SQLCompiler):
         if getattr(select, "_within_group_order_by_clause", None) is not None:
             if select._within_group_order_by_clause.clauses:
                 text += self.within_group_order_by_clause(select, **kwargs)
-        if select._limit is not None or select._offset is not None:
+        if select._limit is not None:
             text += self.limit_clause(select)
         if getattr(select, "_options", None) is not None:
             if select._options.options:
