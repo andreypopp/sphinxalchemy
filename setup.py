@@ -13,5 +13,6 @@ setup(
     zip_safe=False,
     entry_points="""
     [sqlalchemy.dialects]
-    sphinx = sphinxalchemy.dialect:SphinxDialect
+    sphinx         = sphinxalchemy.mysqldb:Dialect
+    sphinx.mysqldb = sphinxalchemy.mysqldb:Dialect
     """)

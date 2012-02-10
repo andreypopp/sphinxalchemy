@@ -1,6 +1,5 @@
 """ Dialect implementaiton for SphinxQL based on MySQLdb-Python protocol"""
 
-from sqlalchemy.connectors import mysqldb
 from sqlalchemy.engine import default
 from sqlalchemy.sql import compiler
 from sqlalchemy.sql import expression as sql
@@ -183,7 +182,7 @@ class SphinxCompiler(compiler.SQLCompiler):
         else:
             return text
 
-class SphinxDialect(default.DefaultDialect, mysqldb.MySQLDBConnector):
+class SphinxDialect(default.DefaultDialect):
 
     name = "sphinx"
     statement_compiler = SphinxCompiler
