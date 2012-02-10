@@ -12,8 +12,6 @@ class Index(Table):
 
     def __init__(self, *args, **kwargs):
         super(Index, self).__init__(*args, **kwargs)
-        self.append_column(SpecialAttribute("id"))
-        self.append_column(SpecialAttribute("weight"))
 
     def select(self, whereclause=None, **params):
         return select([self], whereclause, **params)
@@ -40,9 +38,6 @@ class ArrayAttribute(Column):
         return expression._BindParamClause(
             None, obj, _compared_to_operator=operator,
             _compared_to_type=types.Integer(), unique=True)
-
-class SpecialAttribute(Attribute):
-    pass
 
 class ArrayAttributeType(types.TypeDecorator):
 

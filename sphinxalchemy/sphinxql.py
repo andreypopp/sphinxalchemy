@@ -1,6 +1,6 @@
 """ Constructs for SphinxQL generation"""
 
-from sqlalchemy.sql import expression
+from sqlalchemy.sql import expression, func
 
 __all__ = ("Select", "select")
 
@@ -29,6 +29,14 @@ class Select(expression.Select):
 
     _within_group_order_by_clause = expression.ClauseList()
     _options = None
+
+    def __init__(self, columns, *args, **kwargs):
+        columns = columns + [func.weight().label("__weight__")]
+        super(Select, self).__init__(columns, *args, **kwargs)
+
+    def with_only_columns(self, columns):
+        columns = columns + [func.weight().label("__weight__")]
+        return super(Select, self).with_only_columns(columns)
 
     @expression._generative
     def match(self, query):

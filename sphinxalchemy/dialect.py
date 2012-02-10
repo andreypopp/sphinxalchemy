@@ -5,8 +5,6 @@ from sqlalchemy.sql import compiler
 from sqlalchemy.sql import expression as sql
 from sqlalchemy import util, exc
 
-from sphinxalchemy.schema import SpecialAttribute
-
 __all__ = ("SphinxDialect",)
 
 class SphinxCompiler(compiler.SQLCompiler):
@@ -63,8 +61,6 @@ class SphinxCompiler(compiler.SQLCompiler):
         else:
             name = self.preparer.quote(name, column.quote)
 
-        if isinstance(column, SpecialAttribute):
-            name = "@" + name
         return name
 
     def visit_match(self, match):
@@ -103,7 +99,6 @@ class SphinxCompiler(compiler.SQLCompiler):
                         within_columns_clause=True,
                         **column_clause_args)
                 for co in util.unique_list(select.inner_columns)
-                if not isinstance(co, SpecialAttribute)
             ]
             if c is not None
         ]
