@@ -15,4 +15,6 @@ setup(
     [sqlalchemy.dialects]
     sphinx         = sphinxalchemy.mysqldb:Dialect
     sphinx.mysqldb = sphinxalchemy.mysqldb:Dialect
+    sphinx.pymysql = sphinxalchemy.pymysql:Dialect
+    sphinx.mysqlconnector = sphinxalchemy.mysqlconnector:Dialect
     """)
