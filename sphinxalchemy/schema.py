@@ -9,6 +9,10 @@ from sphinxalchemy.sphinxql import select
 __all__ = ("Index", "Attribute", "ArrayAttribute")
 
 class Index(Table):
+    """ Sphinx index metadata
+
+    Accepted arguments are the same as :class:`sqlalchemy.schema.Table` accepts.
+    """
 
     def __init__(self, *args, **kwargs):
         super(Index, self).__init__(*args, **kwargs)
@@ -17,6 +21,11 @@ class Index(Table):
         return select([self], whereclause, **params)
 
 class Attribute(Column):
+    """ Sphinx index scalar attribute metadata
+
+    Accepted arguments are the same as :class:`sqlalchemy.schema.Column`
+    accepts.
+    """
 
     def __init__(self, *args, **kwargs):
         args = list(args)
@@ -26,6 +35,11 @@ class Attribute(Column):
         super(Attribute, self).__init__(*args, **kwargs)
 
 class ArrayAttribute(Column):
+    """ Sphinx index array attribute metadata
+
+    Accepted arguments are the same as :class:`sqlalchemy.schema.Column`
+    accepts.
+    """
 
     def __init__(self, *args, **kwargs):
         args = list(args)

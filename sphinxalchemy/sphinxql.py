@@ -26,6 +26,12 @@ class MatchClause(expression.ClauseElement):
         self.query = query
 
 class Select(expression.Select):
+    """ SphinxQL SELECT construct.
+
+    See corresponding doc section_.
+
+    .. _section: http://sphinxsearch.com/docs/2.0.2/sphinxql-select.html
+    """
 
     _within_group_order_by_clause = expression.ClauseList()
     _options = None
@@ -40,6 +46,13 @@ class Select(expression.Select):
 
     @expression._generative
     def match(self, query):
+        """ Provide full text query for index
+
+        Sphinx uses `extended query syntax`_ in SphinxQL.
+
+        .. _`extended query syntax`: \
+                http://sphinxsearch.com/docs/2.0.2/extended-syntax.html
+        """
         self.append_whereclause(MatchClause(query))
 
     @expression._generative
@@ -48,6 +61,12 @@ class Select(expression.Select):
 
     @expression._generative
     def options(self, *args, **kwargs):
+        """ Provide options to execute query
+
+        Available options described here_.
+
+        .. _here: http://sphinxsearch.com/docs/2.0.2/sphinxql-select.html
+        """
         options = list(args) + kwargs.items()
         if self._options is None:
             self._options = _Options(options)
@@ -84,4 +103,8 @@ class Select(expression.Select):
                     if x is not None]
 
 def select(columns=None, whereclause=None, from_obj=[], **kwargs):
+    """ Factory for creating :class:`.Select` constructs.
+
+    Ressembles :func:`sqlalchemy.sql.expression.select`.
+    """
     return Select(columns, whereclause=whereclause, from_obj=from_obj, **kwargs)
