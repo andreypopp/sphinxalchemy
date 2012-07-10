@@ -9,14 +9,17 @@ from sphinxalchemy.dialect import SphinxDialect
 
 __all__ = ("Dialect",)
 
+
 class Connection(MySQLConnection):
 
     def get_autocommit(self):
         return False
+
     def set_autocommit(self, value):
         pass
 
     autocommit = property(get_autocommit, set_autocommit)
+
 
 class DBAPIShim(object):
 
@@ -25,6 +28,7 @@ class DBAPIShim(object):
 
     def __getattr__(self, name):
         return getattr(connector, name)
+
 
 class Dialect(SphinxDialect, mysqlconnector.MySQLDialect_mysqlconnector):
 
