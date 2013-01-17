@@ -71,7 +71,11 @@ API reference
 .. autoclass:: sphinxalchemy.sphinxql.Select
    :members: match, options
 
+.. autoclass:: sphinxalchemy.sphinxql.Replace
+   :members: match, options
+
 .. autofunction:: sphinxalchemy.sphinxql.select
+.. autofunction:: sphinxalchemy.sphinxql.replace
 
 .. _Sphinx: http://sphinxsearch.com
 .. _SphinxQL: http://sphinxsearch.com/docs/2.0.2/sphinxql-reference.html
