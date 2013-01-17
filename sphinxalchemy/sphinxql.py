@@ -2,7 +2,8 @@
 
 from sqlalchemy.sql import expression, func
 
-__all__ = ("Select", "select")
+__all__ = ("Select", "Replace", "select", "replace")
+
 
 class _Options(object):
 
@@ -18,12 +19,14 @@ class _Options(object):
     def __iter__(self):
         return iter(self.options)
 
+
 class MatchClause(expression.ClauseElement):
 
     __visit_name__ = "match"
 
     def __init__(self, query):
         self.query = query
+
 
 class Select(expression.Select):
     """ SphinxQL SELECT construct.
@@ -101,6 +104,24 @@ class Select(expression.Select):
         return c + [x for x
                     in self._within_group_order_by_clause
                     if x is not None]
+
+
+class Replace(expression.Insert):
+    """Represent an REPLACE construct.
+
+    The :class:`.Replace` object is created using the :func:`~.replace()` function.
+
+    See also:
+
+    :ref:`coretutorial_insert_expressions`
+
+    """
+    __visit_name__ = 'replace'
+
+
+def replace(table, values=None, inline=False, **kwargs):
+    return Replace(table, values, inline=inline, **kwargs)
+
 
 def select(columns=None, whereclause=None, from_obj=[], **kwargs):
     """ Factory for creating :class:`.Select` constructs.

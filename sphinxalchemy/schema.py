@@ -4,9 +4,10 @@ from sqlalchemy.schema import Table, Column
 from sqlalchemy import types
 from sqlalchemy.sql import expression
 
-from sphinxalchemy.sphinxql import select
+from sphinxalchemy.sphinxql import select, replace
 
 __all__ = ("Index", "Attribute", "ArrayAttribute")
+
 
 class Index(Table):
     """ Sphinx index metadata
@@ -19,6 +20,21 @@ class Index(Table):
 
     def select(self, whereclause=None, **params):
         return select([self], whereclause, **params)
+
+    def replace(self, values=None, inline=False, **kwargs):
+        """Generate an :func:`.replace` construct against this
+        :class:`.Index`.
+
+        E.g.::
+
+            index.replace().values(name='foo')
+
+        See :func:`.replace` for argument and usage information.
+
+        """
+
+        return replace(self, values=values, inline=inline, **kwargs)
+
 
 class Attribute(Column):
     """ Sphinx index scalar attribute metadata
@@ -33,6 +49,7 @@ class Attribute(Column):
             args.pop(1)
         kwargs["type_"] = types.Integer()
         super(Attribute, self).__init__(*args, **kwargs)
+
 
 class ArrayAttribute(Column):
     """ Sphinx index array attribute metadata
@@ -52,6 +69,7 @@ class ArrayAttribute(Column):
         return expression._BindParamClause(
             None, obj, _compared_to_operator=operator,
             _compared_to_type=types.Integer(), unique=True)
+
 
 class ArrayAttributeType(types.TypeDecorator):
 

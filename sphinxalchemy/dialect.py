@@ -7,6 +7,7 @@ from sqlalchemy import util, exc
 
 __all__ = ("SphinxDialect",)
 
+
 class SphinxCompiler(compiler.SQLCompiler):
 
     def within_group_order_by_clause(self, select, **kw):
@@ -22,7 +23,7 @@ class SphinxCompiler(compiler.SQLCompiler):
             r = ", ".join("%s=%s" % (
                 (k, v)
                     if not isinstance(v, dict)
-                    else (k, _compile(v.items(),True)))
+                    else (k, _compile(v.items(), True)))
                 for (k, v) in o)
             if inner:
                 return "(" + r + ")"
@@ -32,9 +33,9 @@ class SphinxCompiler(compiler.SQLCompiler):
     def limit_clause(self, select):
         text = ""
         if select._limit is not None and select._offset is None:
-            text +=  "\n LIMIT " + self.process(sql.literal(select._limit))
+            text += "\n LIMIT " + self.process(sql.literal(select._limit))
         elif select._limit is not None and select._offset is not None:
-            text +=  "\n LIMIT %s, %s" % (
+            text += "\n LIMIT %s, %s" % (
                 self.process(sql.literal(select._offset)),
                 self.process(sql.literal(select._limit)))
         elif select._offset is not None:
@@ -83,11 +84,11 @@ class SphinxCompiler(compiler.SQLCompiler):
         # to outermost if existingfroms: correlate_froms =
         # correlate_froms.union(existingfroms)
 
-        self.stack.append({'from': correlate_froms, 'iswrapper'
-                          : iswrapper})
+        self.stack.append({'from': correlate_froms,
+                           'iswrapper': iswrapper})
 
-        if compound_index==1 and not entry or entry.get('iswrapper', False):
-            column_clause_args = {'result_map':self.result_map}
+        if compound_index == 1 and not entry or entry.get('iswrapper', False):
+            column_clause_args = {'result_map': self.result_map}
         else:
             column_clause_args = {}
 
@@ -176,6 +177,65 @@ class SphinxCompiler(compiler.SQLCompiler):
             return "(" + text + ")"
         else:
             return text
+
+    def visit_replace(self, replace_stmt):
+        """ REPLACE INTO dialect statement
+            (stealed from visit_insert)
+        """
+        self.isinsert = True
+        colparams = self._get_colparams(replace_stmt)
+
+        if not colparams and \
+                not self.dialect.supports_default_values and \
+                not self.dialect.supports_empty_insert:
+            raise exc.CompileError("The version of %s you are using does "
+                                    "not support empty inserts." %
+                                    self.dialect.name)
+
+        preparer = self.preparer
+        supports_default_values = self.dialect.supports_default_values
+
+        text = "REPLACE"
+
+        prefixes = [self.process(x) for x in replace_stmt._prefixes]
+        if prefixes:
+            text += " " + " ".join(prefixes)
+
+        text += " INTO " + preparer.format_table(replace_stmt.table)
+
+        if replace_stmt._hints:
+            dialect_hints = dict([
+                (table, hint_text)
+                for (table, dialect), hint_text in
+                replace_stmt._hints.items()
+                if dialect in ('*', self.dialect.name)
+            ])
+            if replace_stmt.table in dialect_hints:
+                text += " " + self.get_crud_hint_text(
+                                    replace_stmt.table,
+                                    dialect_hints[replace_stmt.table]
+                                )
+
+        if colparams or not supports_default_values:
+            text += " (%s)" % ', '.join([preparer.format_column(c[0])
+                       for c in colparams])
+
+        if self.returning or replace_stmt._returning:
+            self.returning = self.returning or replace_stmt._returning
+            returning_clause = self.returning_clause(
+                                    replace_stmt, self.returning)
+
+            if self.returning_precedes_values:
+                text += " " + returning_clause
+
+        text += " VALUES (%s)" % \
+                 ', '.join([c[1] for c in colparams])
+
+        if self.returning and not self.returning_precedes_values:
+            text += " " + returning_clause
+
+        return text
+
 
 class SphinxDialect(default.DefaultDialect):
 
