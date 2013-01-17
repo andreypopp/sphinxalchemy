@@ -12,6 +12,9 @@ setup(
     author_email="8mayday@gmail.com",
     packages=find_packages(exclude=["ez_setup", "examples", "tests"]),
     zip_safe=False,
+    install_requires=[
+        "sqlalchemy < 0.8a",
+    ],
     entry_points="""
     [sqlalchemy.dialects]
     sphinx         = sphinxalchemy.mysqldb:Dialect
