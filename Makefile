@@ -3,3 +3,6 @@ test develop install dist bdist_egg sdist upload register:
 
 docs::
 	@make -C docs html
+
+clean:
+	rm -rf dist build
